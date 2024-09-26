@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from DQN import DQNAgent
 from data_collection import FinancialDataDownloader
+from data_preprocessing import DataPreprocessing
+
 
 tickers = {
     'Vanguard_Index_Fund': 'VFINX',
@@ -22,23 +24,22 @@ data_downloader.show_data('Vanguard_Index_Fund')
 
 # Show the data for S&P 500 Index Fund
 data_downloader.show_data('S&P_500_Index_Fund')
+preprocessing = DataPreprocessing(data_dict=downloaded_data)
+
+# Calculate returns for all assets
+preprocessing.calculate_returns()
+
+# Calculate volatility for all assets (using a 21-day window for monthly volatility)
+preprocessing.calculate_volatility(window=21)
+
+# Get the preprocessed data
+preprocessed_data = preprocessing.get_preprocessed_data()
+
+# Example of how to access the data for a specific asset (e.g., Vanguard Index Fund)
+print(preprocessed_data['Vanguard_Index_Fund'].head())
 
 state_size = 10  # Example state (e.g., 5 assets + 5 weights)
-action_size = 5  # Buy/sell/hold each of 5 assets
+action_size = 5  
 agent = DQNAgent(state_size, action_size)
 
-# Simulated training loop (replace with real portfolio data)
-for e in range(1000):  # 1000 episodes
-    state = np.random.randn(state_size)  # Example state (replace with real market data)
-    for time in range(500):  # Example time steps
-        action = agent.act(state)
-        next_state = np.random.randn(state_size)  # Example next state (replace with real data)
-        reward = np.random.rand()  # Example reward (replace with portfolio returns)
-        done = time == 499
-        agent.remember(state, action, reward, next_state, done)
-        state = next_state
-        if done:
-            agent.update_target_network()
-            break
-    if len(agent.memory) > 32:  # Example batch size
-        agent.replay(32)
+
