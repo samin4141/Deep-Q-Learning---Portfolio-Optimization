@@ -26,15 +26,15 @@ class PortfolioEnvironment:
         - Calculates portfolio return, reward (e.g., Sharpe Ratio), and whether the episode is done.
         """
         self.current_step += 1
-        if self.current_step >= len(self.data[self.asset_names[0]]):
+        if self.current_step >= min([len(self.data[self.asset_names[i]]) for i in range(len(self.asset_names))]):
             self.done = True
-        
+        print("Current Step:", self.current_step - 1)
         # Calculate reward (e.g., portfolio return or Sharpe Ratio)
         portfolio_return = sum(
-            [self.data[asset].iloc[self.current_step]['Return'] * action[i] for i, asset in enumerate(self.asset_names)]
+            [self.data[asset]['Return'].iloc[self.current_step - 1] * action[i] for i, asset in enumerate(self.asset_names)]
         )
         volatility = sum(
-            [self.data[asset].iloc[self.current_step]['Volatility'] * action[i] for i, asset in enumerate(self.asset_names)]
+            [self.data[asset].iloc[self.current_step - 1]['Volatility'] * action[i] for i, asset in enumerate(self.asset_names)]
         )
         sharpe_ratio = portfolio_return / (volatility + 1e-5)  # Prevent division by zero
         reward = sharpe_ratio

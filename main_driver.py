@@ -9,6 +9,7 @@ import random
 import os
 
 
+
 tickers = {
     'Vanguard_Index_Fund': 'VFINX',
     'S&P_500_Index_Fund': '^GSPC',
@@ -17,11 +18,11 @@ tickers = {
     '10Y_Treasury_Bonds': '^TNX'
 }
 
-BATCH_SIZE = int(os.getenv('BATCH_SIZE', 32))
-EPISODES = int(os.getenv('EPISODES', 1000))
-START_DATE = os.getenv('START_DATE', '2018-01-01')
-END_DATE = os.getenv('END_DATE', '2023-01-01')
-WINDOW = int(os.getenv('WINDOW', 21))
+BATCH_SIZE = 32 #int(os.getenv('BATCH_SIZE', 32))
+EPISODES = 1000 #int(os.getenv('EPISODES', 1000))
+START_DATE = '2018-01-01' #os.getenv('START_DATE', '2018-01-01')
+END_DATE = '2023-01-01' #os.getenv('END_DATE', '2023-01-01')
+WINDOW = 21 #int(os.getenv('WINDOW', 21))
 
 # Initialize the class with tickers and date range
 data_downloader = FinancialDataDownloader(tickers=tickers, start_date='2018-01-01', end_date='2023-01-01')
@@ -48,10 +49,11 @@ preprocessed_data = preprocessing.get_preprocessed_data()
 # Example of how to access the data for a specific asset (e.g., Vanguard Index Fund)
 print(preprocessed_data['Vanguard_Index_Fund'].head())
 
-state_size = 10  # Example state (e.g., 5 assets + 5 weights)
-action_size = 5  
-agent = DQNAgent(state_size, action_size)
+#state_size = 10  # Example state (e.g., 5 assets + 5 weights)
+#action_size = 5  
 
+for key, value in preprocessed_data.items():
+    print(key, value.shape)
 # Training DQN for Portfolio Optimization
 # Initialize the portfolio environment
 env = PortfolioEnvironment(preprocessed_data)
@@ -67,11 +69,12 @@ replay_memory = deque(maxlen=2000)
 for episode in range(EPISODES):
     state = env.reset()
     total_reward = 0
-
-    for time_step in range(len(preprocessed_data['Vanguard_Index_Fund']) - 1):
+    print("Episode:", episode)
+    for time_step in range(len(preprocessed_data['Gold']) - 1):
+        print("time_step:", time_step)
         # Choose action using epsilon-greedy policy
         action = agent.act(state)
-        
+        #print(action, type(action))
         # Execute action and get the next state and reward
         next_state, reward, done = env.step(action)
         
